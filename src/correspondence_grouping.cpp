@@ -27,13 +27,14 @@ typedef pcl::PointXYZ PointType;
 typedef pcl::Normal NormalType;
 typedef pcl::ReferenceFrame RFType;
 typedef pcl::SHOT352 DescriptorType;
-
+ 
 std::string model_filename_;
 std::string scene_filename_;
 
 //Algorithm params
 bool show_keypoints_ (false);
 bool show_correspondences_ (false);
+bool show_normals_(false);
 bool use_cloud_resolution_ (false);
 bool use_hough_ (true);
 float model_ss_ (0.05f);
@@ -57,6 +58,7 @@ showHelp (char *filename)
   std::cout << "     -h:                     Show this help." << std::endl;
   std::cout << "     -k:                     Show used keypoints." << std::endl;
   std::cout << "     -c:                     Show used correspondences." << std::endl;
+  std::cout << "     -n:                     Show used Normals." << std::endl;
   std::cout << "     -r:                     Compute the model cloud resolution and multiply" << std::endl;
   std::cout << "                             each radius given by that value." << std::endl;
   std::cout << "     --algorithm (Hough|GC): Clustering algorithm used (default Hough)." << std::endl;
@@ -103,6 +105,11 @@ parseCommandLine (int argc, char *argv[])
   if (pcl::console::find_switch (argc, argv, "-r"))
   {
     use_cloud_resolution_ = true;
+  }
+
+  if (pcl::console::find_switch (argc, argv, "-n"))
+  {
+    show_normals_ = true;
   }
 
   std::string used_algorithm;
@@ -262,7 +269,7 @@ main (int argc, char *argv[])
 
 
   //
-  //  Downsample Clouds to Extract keypoints //////////////////////////////////////////////////////////////////////////////////////////////
+  //  Downsample Clouds to Extract keypoints ////////////////////////////////////////////////
   //
 
 	// ISS keypoint detector model.
@@ -450,7 +457,9 @@ main (int argc, char *argv[])
   //  Visualization
   //
   pcl::visualization::PCLVisualizer viewer ("Correspondence Grouping");
-  viewer.addPointCloud (scene, "scene_cloud");
+
+  pcl::visualization::PointCloudColorHandlerCustom<PointType> scene_color_handler (scene, 0, 0, 255);
+  viewer.addPointCloud (scene,scene_color_handler, "scene_cloud");
 
   pcl::PointCloud<PointType>::Ptr off_scene_model (new pcl::PointCloud<PointType> ());
   pcl::PointCloud<PointType>::Ptr off_scene_model_keypoints (new pcl::PointCloud<PointType> ());
@@ -465,6 +474,9 @@ main (int argc, char *argv[])
     viewer.addPointCloud (off_scene_model, off_scene_model_color_handler, "off_scene_model");
   }
 
+
+
+
   if (show_keypoints_)
   {
     pcl::visualization::PointCloudColorHandlerCustom<PointType> scene_keypoints_color_handler (scene_keypoints, 0, 0, 255);
@@ -475,6 +487,23 @@ main (int argc, char *argv[])
     viewer.addPointCloud (off_scene_model_keypoints, off_scene_model_keypoints_color_handler, "off_scene_model_keypoints");
     viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "off_scene_model_keypoints");
   }
+
+
+
+
+
+  if (show_normals_)
+  {
+
+  viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal> (scene, scene_normals, 1, 0.005, "normals");
+  viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal> (off_scene_model, model_normals, 1, 0.005, "normal");
+
+  }  
+
+
+
+
+
 
   for (size_t i = 0; i < rototranslations.size (); ++i)
   {

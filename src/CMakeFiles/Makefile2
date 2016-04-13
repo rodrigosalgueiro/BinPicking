@@ -50,10 +50,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /usr/bin/cmake-gui
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio
+CMAKE_SOURCE_DIR = /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src
+CMAKE_BINARY_DIR = /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src
 
 #=============================================================================
 # Target rules for target CMakeFiles/allclean.dir
@@ -62,15 +62,15 @@ CMAKE_BINARY_DIR = /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src
 CMakeFiles/allclean.dir/all:
 	$(MAKE) -f CMakeFiles/allclean.dir/build.make CMakeFiles/allclean.dir/depend
 	$(MAKE) -f CMakeFiles/allclean.dir/build.make CMakeFiles/allclean.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src/CMakeFiles 
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src/CMakeFiles 
 	@echo "Built target allclean"
 .PHONY : CMakeFiles/allclean.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/allclean.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src/CMakeFiles 0
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/allclean.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src/CMakeFiles 0
 .PHONY : CMakeFiles/allclean.dir/rule
 
 # Convenience name for target.
@@ -93,7 +93,7 @@ clean: CMakeFiles/allclean.dir/clean
 CMakeFiles/correspondence_grouping.dir/all:
 	$(MAKE) -f CMakeFiles/correspondence_grouping.dir/build.make CMakeFiles/correspondence_grouping.dir/depend
 	$(MAKE) -f CMakeFiles/correspondence_grouping.dir/build.make CMakeFiles/correspondence_grouping.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src/CMakeFiles  1
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src/CMakeFiles  1
 	@echo "Built target correspondence_grouping"
 .PHONY : CMakeFiles/correspondence_grouping.dir/all
 
@@ -103,9 +103,9 @@ all: CMakeFiles/correspondence_grouping.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/correspondence_grouping.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src/CMakeFiles 1
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/correspondence_grouping.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src/CMakeFiles 0
 .PHONY : CMakeFiles/correspondence_grouping.dir/rule
 
 # Convenience name for target.

@@ -38,10 +38,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /usr/bin/cmake-gui
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio
+CMAKE_SOURCE_DIR = /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src
+CMAKE_BINARY_DIR = /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src
 
 # Utility rule file for allclean.
 
@@ -50,7 +50,7 @@ include CMakeFiles/allclean.dir/progress.make
 
 CMakeFiles/allclean:
 	make clean
-	rm -rf /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/bin /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/include /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/lib CMakeCache.txt CMakeFiles cmake_install.cmake install_manifest.txt Makefile
+	rm -rf /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/bin /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/include /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/lib CMakeCache.txt CMakeFiles cmake_install.cmake install_manifest.txt Makefile
 	echo CLEARED\ ALL\ EXCEPT\ THE\ SOURCES!
 
 allclean: CMakeFiles/allclean
@@ -66,6 +66,6 @@ CMakeFiles/allclean.dir/clean:
 .PHONY : CMakeFiles/allclean.dir/clean
 
 CMakeFiles/allclean.dir/depend:
-	cd /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src /home/rodrigosalgueiro/Dissertacao/CorrespEnsaio/src/CMakeFiles/allclean.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src/CMakeFiles/allclean.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/allclean.dir/depend
 
