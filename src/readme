@@ -7,5 +7,7 @@ O ficheiros anexos são respectivamente:
 		-model nuvens sintécticas "box3.pcd" "box5.pcd";
 		-model covert mesh2pcd "pclbox3.pcd";
 		-model digitalizado kinect "modelfiltered.pcd";
+
+		-model virtual_scanner "sample_perp.pcd";
 		
 		-scene Kinect "boxandother.pcd" "scene_box1.pcd" "scene_box2.pcd";  

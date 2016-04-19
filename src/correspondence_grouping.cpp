@@ -37,12 +37,12 @@ bool show_correspondences_ (false);
 bool show_normals_(false);
 bool use_cloud_resolution_ (false);
 bool use_hough_ (true);
-float model_ss_ (0.05f);
-float scene_ss_ (0.05f);
+float model_ss_ (0.01f);
+float scene_ss_ (0.01f);
 float rf_rad_ (0.015f);
-float descr_rad_ (0.03f);
+float descr_rad_ (0.05f);
 float cg_size_ (0.01f);
-float cg_thresh_ (10.0f);
+float cg_thresh_ (5.0f);
 
 void
 showHelp (char *filename)
@@ -239,7 +239,7 @@ main (int argc, char *argv[])
   norm_est.compute (*scene_normals);
 
 
-/*
+
 //
 //  Downsample Clouds to Extract keypoints
 //
@@ -263,7 +263,7 @@ main (int argc, char *argv[])
 
   pcl::copyPointCloud(*scene, keypointIndices2.points, *scene_keypoints);
   std::cout << "Scene total points: " << scene->size () << "; Selected Keypoints: " << scene_keypoints->size () << std::endl; 
-*/
+
 
 
 
@@ -271,7 +271,7 @@ main (int argc, char *argv[])
   //
   //  Downsample Clouds to Extract keypoints ////////////////////////////////////////////////
   //
-
+/*
 	// ISS keypoint detector model.
 	pcl::ISSKeypoint3D<pcl::PointXYZ, pcl::PointXYZ> detector;
 	detector.setInputCloud(model);
@@ -315,6 +315,7 @@ main (int argc, char *argv[])
  
 	detector.compute(*scene_keypoints);
 	std::cout << "scene_keypoints: " << scene_keypoints->size () << std::endl;//debug
+*/
   //
   //  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 
@@ -354,7 +355,7 @@ main (int argc, char *argv[])
       continue;
     }
     int found_neighs = match_search.nearestKSearch (scene_descriptors->at (i), 1, neigh_indices, neigh_sqr_dists);
-    if(found_neighs == 1 && neigh_sqr_dists[0] < 0.30f) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
+    if(found_neighs == 1 && neigh_sqr_dists[0] < 0.25f) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
     {
       pcl::Correspondence corr (neigh_indices[0], static_cast<int> (i), neigh_sqr_dists[0]);
       model_scene_corrs->push_back (corr);
@@ -458,7 +459,7 @@ main (int argc, char *argv[])
   //
   pcl::visualization::PCLVisualizer viewer ("Correspondence Grouping");
 
-  pcl::visualization::PointCloudColorHandlerCustom<PointType> scene_color_handler (scene, 0, 0, 255);
+  pcl::visualization::PointCloudColorHandlerCustom<PointType> scene_color_handler (scene, 255, 0, 255);
   viewer.addPointCloud (scene,scene_color_handler, "scene_cloud");
 
   pcl::PointCloud<PointType>::Ptr off_scene_model (new pcl::PointCloud<PointType> ());
