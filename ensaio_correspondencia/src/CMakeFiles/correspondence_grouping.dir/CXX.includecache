@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src/correspondence_grouping.cpp
+/home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_correspondencia/src/correspondence_grouping.cpp
 pcl/io/pcd_io.h
 -
 pcl/point_cloud.h

@@ -42,10 +42,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /usr/bin/cmake-gui
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking
+CMAKE_SOURCE_DIR = /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_correspondencia
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src
+CMAKE_BINARY_DIR = /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_correspondencia/src
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -72,9 +72,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src/CMakeFiles /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_correspondencia/src/CMakeFiles /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_correspondencia/src/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/src/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_correspondencia/src/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -127,6 +127,19 @@ correspondence_grouping/fast:
 	$(MAKE) -f CMakeFiles/correspondence_grouping.dir/build.make CMakeFiles/correspondence_grouping.dir/build
 .PHONY : correspondence_grouping/fast
 
+#=============================================================================
+# Target rules for targets named correspondence_grouping_multiview
+
+# Build rule for target.
+correspondence_grouping_multiview: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 correspondence_grouping_multiview
+.PHONY : correspondence_grouping_multiview
+
+# fast build rule for target.
+correspondence_grouping_multiview/fast:
+	$(MAKE) -f CMakeFiles/correspondence_grouping_multiview.dir/build.make CMakeFiles/correspondence_grouping_multiview.dir/build
+.PHONY : correspondence_grouping_multiview/fast
+
 correspondence_grouping.o: correspondence_grouping.cpp.o
 .PHONY : correspondence_grouping.o
 
@@ -151,6 +164,30 @@ correspondence_grouping.cpp.s:
 	$(MAKE) -f CMakeFiles/correspondence_grouping.dir/build.make CMakeFiles/correspondence_grouping.dir/correspondence_grouping.cpp.s
 .PHONY : correspondence_grouping.cpp.s
 
+correspondence_grouping_multiview.o: correspondence_grouping_multiview.cpp.o
+.PHONY : correspondence_grouping_multiview.o
+
+# target to build an object file
+correspondence_grouping_multiview.cpp.o:
+	$(MAKE) -f CMakeFiles/correspondence_grouping_multiview.dir/build.make CMakeFiles/correspondence_grouping_multiview.dir/correspondence_grouping_multiview.cpp.o
+.PHONY : correspondence_grouping_multiview.cpp.o
+
+correspondence_grouping_multiview.i: correspondence_grouping_multiview.cpp.i
+.PHONY : correspondence_grouping_multiview.i
+
+# target to preprocess a source file
+correspondence_grouping_multiview.cpp.i:
+	$(MAKE) -f CMakeFiles/correspondence_grouping_multiview.dir/build.make CMakeFiles/correspondence_grouping_multiview.dir/correspondence_grouping_multiview.cpp.i
+.PHONY : correspondence_grouping_multiview.cpp.i
+
+correspondence_grouping_multiview.s: correspondence_grouping_multiview.cpp.s
+.PHONY : correspondence_grouping_multiview.s
+
+# target to generate assembly for a file
+correspondence_grouping_multiview.cpp.s:
+	$(MAKE) -f CMakeFiles/correspondence_grouping_multiview.dir/build.make CMakeFiles/correspondence_grouping_multiview.dir/correspondence_grouping_multiview.cpp.s
+.PHONY : correspondence_grouping_multiview.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -159,11 +196,15 @@ help:
 	@echo "... depend"
 	@echo "... allclean"
 	@echo "... correspondence_grouping"
+	@echo "... correspondence_grouping_multiview"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... correspondence_grouping.o"
 	@echo "... correspondence_grouping.i"
 	@echo "... correspondence_grouping.s"
+	@echo "... correspondence_grouping_multiview.o"
+	@echo "... correspondence_grouping_multiview.i"
+	@echo "... correspondence_grouping_multiview.s"
 .PHONY : help
 
 

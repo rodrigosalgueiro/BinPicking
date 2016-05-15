@@ -11,6 +11,9 @@ add_definitions(${PCL_DEFINITIONS})
 add_executable (correspondence_grouping correspondence_grouping.cpp)
 target_link_libraries (correspondence_grouping ${PCL_LIBRARIES})
 
+add_executable (correspondence_grouping_multiview correspondence_grouping_multiview.cpp)
+target_link_libraries (correspondence_grouping_multiview ${PCL_LIBRARIES})
+
 #An optional "allclean" target
 
 add_custom_target ( allclean
