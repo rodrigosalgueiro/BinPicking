@@ -1,4 +1,4 @@
-# Install script for directory: /home/rodrigosalgueiro/Dissertacao/Ident_caixa
+# Install script for directory: /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,7 +38,7 @@ ELSE(CMAKE_INSTALL_COMPONENT)
   SET(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
 ENDIF(CMAKE_INSTALL_COMPONENT)
 
-FILE(WRITE "/home/rodrigosalgueiro/Dissertacao/Ident_caixa/src/${CMAKE_INSTALL_MANIFEST}" "")
+FILE(WRITE "/home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa/src/${CMAKE_INSTALL_MANIFEST}" "")
 FOREACH(file ${CMAKE_INSTALL_MANIFEST_FILES})
-  FILE(APPEND "/home/rodrigosalgueiro/Dissertacao/Ident_caixa/src/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+  FILE(APPEND "/home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa/src/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
 ENDFOREACH(file)

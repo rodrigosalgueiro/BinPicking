@@ -38,10 +38,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /usr/bin/cmake-gui
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/rodrigosalgueiro/Dissertacao/Ident_caixa
+CMAKE_SOURCE_DIR = /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/rodrigosalgueiro/Dissertacao/Ident_caixa/src
+CMAKE_BINARY_DIR = /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa/src
 
 # Include any dependencies generated for this target.
 include CMakeFiles/segmentation.dir/depend.make
@@ -54,17 +54,17 @@ include CMakeFiles/segmentation.dir/flags.make
 
 CMakeFiles/segmentation.dir/segmentation.cpp.o: CMakeFiles/segmentation.dir/flags.make
 CMakeFiles/segmentation.dir/segmentation.cpp.o: segmentation.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/rodrigosalgueiro/Dissertacao/Ident_caixa/src/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa/src/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/segmentation.dir/segmentation.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/segmentation.dir/segmentation.cpp.o -c /home/rodrigosalgueiro/Dissertacao/Ident_caixa/src/segmentation.cpp
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/segmentation.dir/segmentation.cpp.o -c /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa/src/segmentation.cpp
 
 CMakeFiles/segmentation.dir/segmentation.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/segmentation.dir/segmentation.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/rodrigosalgueiro/Dissertacao/Ident_caixa/src/segmentation.cpp > CMakeFiles/segmentation.dir/segmentation.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa/src/segmentation.cpp > CMakeFiles/segmentation.dir/segmentation.cpp.i
 
 CMakeFiles/segmentation.dir/segmentation.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/segmentation.dir/segmentation.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/rodrigosalgueiro/Dissertacao/Ident_caixa/src/segmentation.cpp -o CMakeFiles/segmentation.dir/segmentation.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa/src/segmentation.cpp -o CMakeFiles/segmentation.dir/segmentation.cpp.s
 
 CMakeFiles/segmentation.dir/segmentation.cpp.o.requires:
 .PHONY : CMakeFiles/segmentation.dir/segmentation.cpp.o.requires
@@ -203,6 +203,6 @@ CMakeFiles/segmentation.dir/clean:
 .PHONY : CMakeFiles/segmentation.dir/clean
 
 CMakeFiles/segmentation.dir/depend:
-	cd /home/rodrigosalgueiro/Dissertacao/Ident_caixa/src && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/rodrigosalgueiro/Dissertacao/Ident_caixa /home/rodrigosalgueiro/Dissertacao/Ident_caixa /home/rodrigosalgueiro/Dissertacao/Ident_caixa/src /home/rodrigosalgueiro/Dissertacao/Ident_caixa/src /home/rodrigosalgueiro/Dissertacao/Ident_caixa/src/CMakeFiles/segmentation.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa/src && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa/src /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa/src /home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_identificacao_caixa/src/CMakeFiles/segmentation.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/segmentation.dir/depend
 
