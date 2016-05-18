@@ -141,7 +141,7 @@ main (int argc, char *argv[])
 	pcl::PointIndices::Ptr inliers_poligonal_prism (new pcl::PointIndices);
 	double z_min = 2.1, z_max = 2.1; // we want the points above the plane, no farther than 5 cm from the surface
 	pcl::ExtractPolygonalPrismData<pcl::PointXYZ> prism;
-	prism.setInputCloud (cloud_edge_projected);
+	prism.setInputCloud (cloud);
 	prism.setInputPlanarHull (cloud_edge_hull);
 	prism.setHeightLimits (z_min, z_max);
 	prism.segment (*inliers_poligonal_prism);
