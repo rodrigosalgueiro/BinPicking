@@ -36,7 +36,8 @@ main (int argc, char *argv[])
 				cloud_inliers_table (new PointCloudT),
 				cloud_outliers_table (new PointCloudT),
 				cloud_edge (new PointCloudT),
-				cloud_edge_projected (new PointCloudT);
+				cloud_edge_projected (new PointCloudT),
+				cloud_poligonal_prism (new PointCloudT);
 
 
 	// Load point cloud
@@ -138,12 +139,19 @@ main (int argc, char *argv[])
 	// Create a Poligonal Prism of the box edge  //
 	///////////////////////////////////////////////
 	pcl::PointIndices::Ptr inliers_poligonal_prism (new pcl::PointIndices);
-	double z_min = 0., z_max = 0.05; // we want the points above the plane, no farther than 5 cm from the surface
+	double z_min = 2.1, z_max = 2.1; // we want the points above the plane, no farther than 5 cm from the surface
 	pcl::ExtractPolygonalPrismData<pcl::PointXYZ> prism;
 	prism.setInputCloud (cloud_edge_projected);
 	prism.setInputPlanarHull (cloud_edge_hull);
 	prism.setHeightLimits (z_min, z_max);
 	prism.segment (*inliers_poligonal_prism);
+
+	// Extract poligonal inliers
+	pcl::ExtractIndices<PointT> extract_polygonal_data;
+	extract_polygonal_data.setInputCloud (cloud);
+	extract_polygonal_data.setIndices (inliers_poligonal_prism);
+	extract_polygonal_data.setNegative (false);		// Extract the inliers
+	extract_polygonal_data.filter (*cloud_poligonal_prism);	// cloud_poligonal_prism contains the box
 
 
 
@@ -171,6 +179,10 @@ main (int argc, char *argv[])
 	// Edge hull
 	pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_edge_hull_handler (cloud, 255, 20, 20); 
 	viewer.addPointCloud (cloud_edge_hull, cloud_edge_hull_handler, "cloud edge hull");
+
+	// Poligonal Prism data
+	pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_poligonal_prism_handler (cloud, 20, 20, 255); 
+	viewer.addPointCloud (cloud_poligonal_prism, cloud_poligonal_prism_handler, "cloud Poligonal Prism");
 	
 
 	while (!viewer.wasStopped ()) {
