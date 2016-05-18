@@ -1,6 +1,7 @@
 #include <iostream>
 #include <pcl/io/io.h>
 #include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
 
 #include <pcl/ModelCoefficients.h>
 
@@ -26,6 +27,70 @@ typedef pcl::PointXYZ PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
 
 
+int
+scale (pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_pol, double offset)
+{
+	float x_total = 0.0,
+		y_total = 0.0,
+		num_points = 0.0,
+		x_centr = 0.0,
+		y_centr = 0.0,
+		X = 0.0,
+		Y = 0.0;
+
+	//ciclo de leitura das coordenadas e cálculo da média 
+	for (size_t i = 0; i < cloud_pol->points.size (); ++i)
+	{
+	X = cloud_pol->points[i].x;
+	Y = cloud_pol->points[i].y;
+
+	x_total = x_total + X;
+	y_total = y_total + Y;
+/*
+	std::cout << "    " << X
+		  << "    " << Y<< std::endl;
+	*/
+
+	}
+
+	num_points = cloud_pol->points.size ();
+
+	x_centr = x_total / num_points;
+	y_centr = y_total / num_points;
+
+/*	std::cout << "    " << x_total
+		  << "    " << y_total
+		  << "    " << num_points 
+		  << "    " << x_centr
+		  << "    " << y_centr << std::endl;
+	*/
+
+	for (size_t i = 0; i < cloud_pol->points.size (); ++i)
+	{
+	X = cloud_pol->points[i].x;
+	Y = cloud_pol->points[i].y;
+
+	X = X - x_centr;
+	Y = Y - y_centr;
+
+	X = X * offset;
+	Y = Y * offset;
+
+	X = X + x_centr;
+	Y = Y + y_centr;
+
+	cloud_pol->points[i].x = X;
+	cloud_pol->points[i].y = Y;
+/*
+	std::cout << "    " << X
+		  << "    " << Y
+		  << "    " << cloud_pol->points[i].x
+		  << "    " << cloud_pol->points[i].y << std::endl;
+	*/
+	}
+
+return 1;
+}
 
 
 int
@@ -125,6 +190,10 @@ main (int argc, char *argv[])
 	proj_edge.setInputCloud (cloud_edge);
 	proj_edge.setModelCoefficients (coefficients_edge);
 	proj_edge.filter (*cloud_edge_projected);
+
+	double merge = 0.9;
+	scale(cloud_edge_projected, merge);
+
 	
 	////////////////////////////////////////////////////////////////////
 	//       Create a Concave Hull representation of the box edge     //
@@ -139,7 +208,7 @@ main (int argc, char *argv[])
 	// Create a Poligonal Prism of the box edge  //
 	///////////////////////////////////////////////
 	pcl::PointIndices::Ptr inliers_poligonal_prism (new pcl::PointIndices);
-	double z_min = 2.1, z_max = 2.1; // we want the points above the plane, no farther than 5 cm from the surface
+	double z_min = -10.1, z_max = 10.1; // we want the points above the plane, no farther than 5 cm from the surface
 	pcl::ExtractPolygonalPrismData<pcl::PointXYZ> prism;
 	prism.setInputCloud (cloud);
 	prism.setInputPlanarHull (cloud_edge_hull);
@@ -155,11 +224,12 @@ main (int argc, char *argv[])
 
 
 
+
 ///////////////////
 // Visualization //
 ///////////////////
 	pcl::visualization::PCLVisualizer viewer ("PCL visualizer");
-
+/*
 	// Table Plane
 	pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_inliers_table_handler (cloud, 20, 255, 255); 
 	viewer.addPointCloud (cloud_inliers_table, cloud_inliers_table_handler, "cloud inliers");
@@ -167,7 +237,7 @@ main (int argc, char *argv[])
 	// Everything else in GRAY
 	pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_outliers_table_handler (cloud, 200, 200, 200); 
 	viewer.addPointCloud (cloud_outliers_table, cloud_outliers_table_handler, "cloud outliers");
-	/*
+	
 	// Edge in Green
 	pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_edge_handler (cloud, 20, 255, 20); 
 	viewer.addPointCloud (cloud_edge, cloud_edge_handler, "cloud edge");
@@ -175,11 +245,11 @@ main (int argc, char *argv[])
 	// Edge projected
 	pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_edge_projected_handler (cloud, 255, 69, 20); 
 	viewer.addPointCloud (cloud_edge_projected, cloud_edge_projected_handler, "cloud edge projected");
-	*/
+	
 	// Edge hull
 	pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_edge_hull_handler (cloud, 255, 20, 20); 
 	viewer.addPointCloud (cloud_edge_hull, cloud_edge_hull_handler, "cloud edge hull");
-
+*/
 	// Poligonal Prism data
 	pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_poligonal_prism_handler (cloud, 20, 20, 255); 
 	viewer.addPointCloud (cloud_poligonal_prism, cloud_poligonal_prism_handler, "cloud Poligonal Prism");

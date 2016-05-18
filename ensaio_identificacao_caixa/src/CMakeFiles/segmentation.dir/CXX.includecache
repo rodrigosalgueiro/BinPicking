@@ -13,6 +13,8 @@ pcl/io/io.h
 -
 pcl/io/pcd_io.h
 -
+pcl/point_types.h
+-
 pcl/ModelCoefficients.h
 -
 pcl/sample_consensus/method_types.h
