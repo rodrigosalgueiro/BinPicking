@@ -229,7 +229,7 @@ main (int argc, char *argv[])
 // Visualization //
 ///////////////////
 	pcl::visualization::PCLVisualizer viewer ("PCL visualizer");
-/*
+
 	// Table Plane
 	pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_inliers_table_handler (cloud, 20, 255, 255); 
 	viewer.addPointCloud (cloud_inliers_table, cloud_inliers_table_handler, "cloud inliers");
@@ -249,7 +249,7 @@ main (int argc, char *argv[])
 	// Edge hull
 	pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_edge_hull_handler (cloud, 255, 20, 20); 
 	viewer.addPointCloud (cloud_edge_hull, cloud_edge_hull_handler, "cloud edge hull");
-*/
+
 	// Poligonal Prism data
 	pcl::visualization::PointCloudColorHandlerCustom<PointT> cloud_poligonal_prism_handler (cloud, 20, 20, 255); 
 	viewer.addPointCloud (cloud_poligonal_prism, cloud_poligonal_prism_handler, "cloud Poligonal Prism");
