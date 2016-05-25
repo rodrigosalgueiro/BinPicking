@@ -73,7 +73,7 @@ float rf_rad_ (0.015f);
 float descr_rad_ (0.02f);
 
 float cg_size_ (0.01f);
-float cg_thresh_ (1.0f);
+float cg_thresh_ (25.0f);
 
 std::string model_directory_;
 
@@ -228,6 +228,44 @@ parseCommandLine (int argc, char *argv[])
     model_filenames_.push_back("../models/0.pcd");
     model_filenames_.push_back("../models/1.pcd");
     model_filenames_.push_back("../models/2.pcd");
+    model_filenames_.push_back("../models/3.pcd");
+    model_filenames_.push_back("../models/4.pcd");
+    model_filenames_.push_back("../models/5.pcd");
+    model_filenames_.push_back("../models/6.pcd");
+    model_filenames_.push_back("../models/7.pcd");
+    model_filenames_.push_back("../models/8.pcd");
+    model_filenames_.push_back("../models/9.pcd");
+    model_filenames_.push_back("../models/10.pcd");
+    model_filenames_.push_back("../models/11.pcd");
+    model_filenames_.push_back("../models/12.pcd");
+    model_filenames_.push_back("../models/13.pcd");
+    model_filenames_.push_back("../models/14.pcd");
+    model_filenames_.push_back("../models/15.pcd");
+    model_filenames_.push_back("../models/16.pcd");
+    model_filenames_.push_back("../models/17.pcd");
+    model_filenames_.push_back("../models/18.pcd");
+    model_filenames_.push_back("../models/19.pcd");
+    model_filenames_.push_back("../models/20.pcd");
+    model_filenames_.push_back("../models/21.pcd");
+    model_filenames_.push_back("../models/22.pcd");
+    model_filenames_.push_back("../models/23.pcd");
+    model_filenames_.push_back("../models/24.pcd");
+    model_filenames_.push_back("../models/25.pcd");
+    model_filenames_.push_back("../models/26.pcd");
+    model_filenames_.push_back("../models/27.pcd");
+    model_filenames_.push_back("../models/28.pcd");
+    model_filenames_.push_back("../models/29.pcd");
+    model_filenames_.push_back("../models/30.pcd");
+    model_filenames_.push_back("../models/31.pcd");
+    model_filenames_.push_back("../models/32.pcd");
+    model_filenames_.push_back("../models/33.pcd");
+    model_filenames_.push_back("../models/34.pcd");
+    model_filenames_.push_back("../models/35.pcd");
+    model_filenames_.push_back("../models/36.pcd");
+    model_filenames_.push_back("../models/37.pcd");
+    model_filenames_.push_back("../models/38.pcd");
+    model_filenames_.push_back("../models/39.pcd");
+    model_filenames_.push_back("../models/40.pcd");
          
   }
 
@@ -330,8 +368,9 @@ main (int argc, char *argv[])
   //}
 
 
+  pcl::PointCloud<PointTypeViewPoint>::Ptr modelviewpoint (new pcl::PointCloud<PointTypeViewPoint> ());
 
-  pcl::PointCloud<PointTypeViewPoint>::Ptr model (new pcl::PointCloud<PointTypeViewPoint> ());
+  pcl::PointCloud<PointType>::Ptr model (new pcl::PointCloud<PointType> ());
   pcl::PointCloud<PointType>::Ptr scene (new pcl::PointCloud<PointType> ());
 
   pcl::PointCloud<PointType>::Ptr model_keypoints (new pcl::PointCloud<PointType> ());
@@ -364,7 +403,8 @@ main (int argc, char *argv[])
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 for(size_t v=0; v<model_filenames_.size(); ++v)///////////////////////////////////////////////////////////////////////////////
 {
-	if (pcl::io::loadPCDFile (model_filenames_[v], *model) < 0)
+
+	if (pcl::io::loadPCDFile (model_filenames_[v], *modelviewpoint) < 0)
 	{
 	std::cout << "Error loading model cloud." << std::endl;
 	showHelp (argv[0]);
@@ -374,8 +414,13 @@ for(size_t v=0; v<model_filenames_.size(); ++v)/////////////////////////////////
 	{
 	std::cout << "loading model cloud " << model_filenames_[v] << std::endl;
 	}
-  
+// Recolha dos view points para calculo das normais
+float vpx = modelviewpoint->points[0].vp_x;
+float vpy = modelviewpoint->points[0].vp_y;   
+float vpz = modelviewpoint->points[0].vp_z;
 
+// Copia da nuvem para tipologia sem view points
+pcl::copyPointCloud<PointTypeViewPoint,PointType>(*modelviewpoint, *model);
 
 
 // see the resolution of the clouds
@@ -422,7 +467,7 @@ std::cout << "Model resolution:  " << res_model << std::endl;
   norm_est.compute (*scene_normals);
 
   norm_est.setInputCloud (model);
-  norm_est.setViewPoint(model.vp_x,model.vp_y,model.vp_z);
+  norm_est.setViewPoint(vpx,vpy,vpz);
   norm_est.compute (*model_normals);
 
 
@@ -680,7 +725,7 @@ std::cout << "Model resolution:  " << res_model << std::endl;
 
     int found_neighs = match_search.nearestKSearch (scene_descriptors->at (i), 1, neigh_indices, neigh_sqr_dists);
 	//std::cout << "neigh_sqr_dists: " << neigh_sqr_dists[0] << std::endl; //debugg
-    if(found_neighs == 1 && neigh_sqr_dists[0] < 900.0f) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
+    if(found_neighs == 1 && neigh_sqr_dists[0] < 800.0f) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
     {
       pcl::Correspondence corr (neigh_indices[0], static_cast<int> (i), neigh_sqr_dists[0]);
       model_scene_corrs->push_back (corr);
@@ -749,9 +794,9 @@ model_view.push_back(chave());
     	gc_clusterer.setModelSceneCorrespondences (model_scene_corrs);
 
     	//gc_clusterer.cluster (clustered_corrs);
-	std::cout << "Passou" << std::endl;
+	//std::cout << "Passou" << std::endl; //debugg
     	gc_clusterer.recognize (model_view[v].rototranslations, model_view[v].clustered_corrs);
-	std::cout << "Passou: "<< v << std::endl;	
+	//std::cout << "Passou: "<< v << std::endl; //debugg	
   	}
 
 
@@ -784,7 +829,7 @@ model_view.push_back(chave());
 }
 
 
-/*
+
   //
   //  Visualization
   //
@@ -799,6 +844,10 @@ model_view.push_back(chave());
   pcl::PointCloud<PointType>::Ptr off_scene_model (new pcl::PointCloud<PointType> ());
   pcl::PointCloud<PointType>::Ptr off_scene_model_keypoints (new pcl::PointCloud<PointType> ());
 
+
+for (size_t v = 0; v < model_view.size (); ++v)
+{
+/*
   if (show_correspondences_ || show_keypoints_)
   {
     //  We are translating the model so that it doesn't end in the middle of the scene representation
@@ -809,10 +858,10 @@ model_view.push_back(chave());
     viewer.addPointCloud (off_scene_model, off_scene_model_color_handler, "off_scene_model");
 	//viewer.addCoordinateSystem(0.1,0);
   }
+*/
 
 
-
-
+/*
   if (show_keypoints_)
   {
     pcl::visualization::PointCloudColorHandlerCustom<PointType> scene_keypoints_color_handler (scene_keypoints, 0, 128, 255);
@@ -823,11 +872,11 @@ model_view.push_back(chave());
     viewer.addPointCloud (off_scene_model_keypoints, off_scene_model_keypoints_color_handler, "off_scene_model_keypoints");
     viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "off_scene_model_keypoints");
   }
+*/
 
 
 
-
-
+/*
   if (show_normals_)
   {
 
@@ -835,16 +884,13 @@ model_view.push_back(chave());
   viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal> (off_scene_model, model_normals, 1, 0.005, "normal");
 
   }  
+*/
 
 
-
-
-
-
-  for (size_t i = 0; i < rototranslations.size (); ++i)
+  for (size_t i = 0; i < model_view.at(v).rototranslations.size (); ++i)
   {
     pcl::PointCloud<PointType>::Ptr rotated_model (new pcl::PointCloud<PointType> ());
-    pcl::transformPointCloud (*model, *rotated_model, rototranslations[i]);
+    pcl::transformPointCloud (*model, *rotated_model, model_view.at(v).rototranslations[i]);
 
     std::stringstream ss_cloud;
     ss_cloud << "instance" << i;
@@ -855,8 +901,8 @@ model_view.push_back(chave());
 	// geração da matriz de rotação para os referenciais dos objectos detectados
 	Eigen::Affine3f t;
 
-	Eigen::Matrix3f rotation = rototranslations[i].block<3,3>(0, 0);
-	Eigen::Vector3f translation = rototranslations[i].block<3,1>(0, 3);
+	Eigen::Matrix3f rotation = model_view.at(v).rototranslations[i].block<3,3>(0, 0);
+	Eigen::Vector3f translation = model_view.at(v).rototranslations[i].block<3,1>(0, 3);
 
 	t.linear() = rotation;
 	t.translation() = translation; 
@@ -865,13 +911,13 @@ model_view.push_back(chave());
 
 	std::string number;
 	std::stringstream strstream;
-	strstream << i;
+	strstream << i+v;
 	strstream >> number;
 	//std::string &id = i;
 
 
-	viewer.addCoordinateSystem(0.1, t, number, 0);
-
+	viewer.addCoordinateSystem(0.05, t, number, 0);
+     /*
     if (show_correspondences_)
     {
       for (size_t j = 0; j < clustered_corrs[i].size (); ++j)
@@ -884,14 +930,15 @@ model_view.push_back(chave());
         //  We are drawing a line for each pair of clustered correspondences found between the model and the scene
         viewer.addLine<PointType, PointType> (model_point, scene_point, 0, 255, 0, ss_line.str ());
       }
-    }
+    }*/
   }
+}
 
   while (!viewer.wasStopped ())
   {
     viewer.spinOnce ();
   }
-*/
+
   return (0);
 
 }

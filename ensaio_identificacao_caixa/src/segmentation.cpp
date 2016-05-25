@@ -105,8 +105,14 @@ main (int argc, char *argv[])
 				cloud_poligonal_prism (new PointCloudT);
 
 
-	// Load point cloud
+	/*// Load point cloud
 	if (pcl::io::loadPCDFile ("caixacomobjectos.pcd", *cloud) < 0) {
+		PCL_ERROR ("Could not load PCD file !\n");
+		return (-1);
+	}*/
+
+	// Load point cloud
+	if (pcl::io::loadPCDFile (argv[1], *cloud) < 0) {
 		PCL_ERROR ("Could not load PCD file !\n");
 		return (-1);
 	}
@@ -153,8 +159,7 @@ main (int argc, char *argv[])
 			plane_table->values[0], plane_table->values[1], plane_table->values[2] , plane_table->values[3]);
 
 
-	//guarda a nuvem filtrada num novo ficheiro 
-	//pcl::io::savePCDFileASCII ("modelfiltered.pcd", *cloud_outliers);
+
 
 ///////////////////////////////////////////
 //           Box Edge Extract            //
@@ -163,7 +168,7 @@ main (int argc, char *argv[])
 	pcl::PassThrough<PointT> pass;
     	pass.setInputCloud (cloud_outliers_table);
     	pass.setFilterFieldName ("z");
-    	pass.setFilterLimits (0.73, 0.76);
+    	pass.setFilterLimits (0.63, 0.68);
     	pass.filter (*cloud_edge);
 
 	pcl::ModelCoefficients::Ptr coefficients_edge (new pcl::ModelCoefficients);
@@ -191,7 +196,7 @@ main (int argc, char *argv[])
 	proj_edge.setModelCoefficients (coefficients_edge);
 	proj_edge.filter (*cloud_edge_projected);
 
-	double merge = 0.9;
+	double merge = 0.75;
 	scale(cloud_edge_projected, merge);
 
 	
@@ -208,22 +213,23 @@ main (int argc, char *argv[])
 	// Create a Poligonal Prism of the box edge  //
 	///////////////////////////////////////////////
 	pcl::PointIndices::Ptr inliers_poligonal_prism (new pcl::PointIndices);
-	double z_min = -10.1, z_max = 10.1; // we want the points above the plane, no farther than 5 cm from the surface
+	double z_min = -1.0, z_max = 0.0; // we want the points above the plane, no farther than 5 cm from the surface
 	pcl::ExtractPolygonalPrismData<pcl::PointXYZ> prism;
-	prism.setInputCloud (cloud);
+	prism.setInputCloud (cloud_outliers_table);
 	prism.setInputPlanarHull (cloud_edge_hull);
 	prism.setHeightLimits (z_min, z_max);
 	prism.segment (*inliers_poligonal_prism);
 
 	// Extract poligonal inliers
 	pcl::ExtractIndices<PointT> extract_polygonal_data;
-	extract_polygonal_data.setInputCloud (cloud);
+	extract_polygonal_data.setInputCloud (cloud_outliers_table);
 	extract_polygonal_data.setIndices (inliers_poligonal_prism);
 	extract_polygonal_data.setNegative (false);		// Extract the inliers
 	extract_polygonal_data.filter (*cloud_poligonal_prism);	// cloud_poligonal_prism contains the box
 
 
-
+	//guarda a nuvem filtrada num novo ficheiro 
+	//pcl::io::savePCDFileASCII ("Atest_pecasfinal.pcd", *cloud_poligonal_prism);
 
 ///////////////////
 // Visualization //
