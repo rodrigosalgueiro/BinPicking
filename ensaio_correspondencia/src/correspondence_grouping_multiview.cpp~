@@ -66,14 +66,14 @@ bool use_shot(true);//default
 bool use_pfh(false);
 bool use_usd(false);
 
-float model_ss_ (0.005f);
-float scene_ss_ (0.005f);
+float model_ss_ (0.003f); //Amostragem do modelo para cálculo dos keyoints
+float scene_ss_ (0.003f); //Amostragem da cena para cálculo dos keyoints
 
 float rf_rad_ (0.015f);
-float descr_rad_ (0.02f);
+float descr_rad_ (0.08f); //Raio para o cálculo do descritor
 
-float cg_size_ (0.01f);
-float cg_thresh_ (25.0f);
+float cg_size_ (0.08f); //Cluster size
+float cg_thresh_ (30.0f);
 
 std::string model_directory_;
 
@@ -225,7 +225,12 @@ parseCommandLine (int argc, char *argv[])
   {
     std::cout << "model_directory_=" << model_directory_ << std::endl;
 //TODO criar a list de strings usando uma analise da diretoria (dir)
-    model_filenames_.push_back("../models/0.pcd");
+
+//model_filenames_.push_back("../models/025.pcd");
+//model_filenames_.push_back("../models/015.pcd");
+model_filenames_.push_back("../models/0089.pcd");
+
+    /*model_filenames_.push_back("../models/0.pcd");
     model_filenames_.push_back("../models/1.pcd");
     model_filenames_.push_back("../models/2.pcd");
     model_filenames_.push_back("../models/3.pcd");
@@ -265,7 +270,7 @@ parseCommandLine (int argc, char *argv[])
     model_filenames_.push_back("../models/37.pcd");
     model_filenames_.push_back("../models/38.pcd");
     model_filenames_.push_back("../models/39.pcd");
-    model_filenames_.push_back("../models/40.pcd");
+    model_filenames_.push_back("../models/40.pcd");*/
          
   }
 
@@ -401,6 +406,7 @@ main (int argc, char *argv[])
   }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+printf("Loading %ld models", model_filenames_.size());
 for(size_t v=0; v<model_filenames_.size(); ++v)///////////////////////////////////////////////////////////////////////////////
 {
 
@@ -725,7 +731,7 @@ std::cout << "Model resolution:  " << res_model << std::endl;
 
     int found_neighs = match_search.nearestKSearch (scene_descriptors->at (i), 1, neigh_indices, neigh_sqr_dists);
 	//std::cout << "neigh_sqr_dists: " << neigh_sqr_dists[0] << std::endl; //debugg
-    if(found_neighs == 1 && neigh_sqr_dists[0] < 800.0f) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
+    if(found_neighs == 1 && neigh_sqr_dists[0] < 100.0f) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
     {
       pcl::Correspondence corr (neigh_indices[0], static_cast<int> (i), neigh_sqr_dists[0]);
       model_scene_corrs->push_back (corr);
