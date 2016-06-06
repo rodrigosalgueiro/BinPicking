@@ -1,3 +1,0 @@
-/home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_correspondencia/src/CMakeFiles/allclean.dir
-/home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_correspondencia/src/CMakeFiles/correspondence_grouping.dir
-/home/rodrigosalgueiro/Dissertacao/gitEnsaioCorresp/BinPicking/ensaio_correspondencia/src/CMakeFiles/correspondence_grouping_multiview.dir
