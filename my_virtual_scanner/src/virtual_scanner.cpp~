@@ -137,7 +137,7 @@ main (int argc, char** argv)
   bool object_coordinates = true;
   console::parse_argument (argc, argv, "-object_coordinates", object_coordinates);
 
-  bool single_view = false;
+  bool single_view = ;
   console::parse_argument (argc, argv, "-single_view", single_view);
 
   double vx = 0, vy = 0, vz = 0;

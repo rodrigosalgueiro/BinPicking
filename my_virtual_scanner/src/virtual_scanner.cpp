@@ -54,6 +54,8 @@
 //#include "boost.h"
 //#include <boost/algorithm/string.hpp>
 
+ 
+
 using namespace pcl;
 
 #define EPS 0.00001
@@ -66,6 +68,8 @@ struct ScanParameters
   double hor_res;           // horizontal  resolution (of laser beam) in degrees
   double max_dist;          // maximum distance in units.
 };
+
+ 
 
 
 /** \brief Loads a 3D point cloud from a given fileName, and returns: a
@@ -137,7 +141,7 @@ main (int argc, char** argv)
   bool object_coordinates = true;
   console::parse_argument (argc, argv, "-object_coordinates", object_coordinates);
 
-  bool single_view = false;
+  bool single_view = true;
   console::parse_argument (argc, argv, "-single_view", single_view);
 
   double vx = 0, vy = 0, vz = 0;
@@ -185,9 +189,9 @@ main (int argc, char** argv)
   sp.nr_points_in_scans = 900;
   console::parse_argument (argc, argv, "-pts_in_scan", sp.nr_points_in_scans);
   sp.max_dist           = 30000;   // maximum distance (in mm)
-  sp.vert_res           = 0.25;
+  sp.vert_res           = 0.089;        //0.25;
   console::parse_argument (argc, argv, "-vert_res", sp.vert_res);
-  sp.hor_res            = 0.25;
+  sp.hor_res            = 0.089;        //0.25;
   console::parse_argument (argc, argv, "-hor_res", sp.hor_res);
 
   int noise_model = 0;               // set the default noise level to none
@@ -470,6 +474,7 @@ main (int argc, char** argv)
     }
 
     pcl::PCDWriter writer;
+   
     PCL_INFO ("Wrote %lu points (%d x %d) to %s\n", cloud.points.size (), cloud.width, cloud.height, fname.c_str ());
     writer.writeASCII (fname.c_str (), cloud);
 
