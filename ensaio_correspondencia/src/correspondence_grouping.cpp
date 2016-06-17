@@ -24,14 +24,29 @@
 #include <pcl/common/transforms.h>
 #include <pcl/console/parse.h>
 
+// ensaio de acerto de resolução
+#include <iostream>
 
+#include <string.h>
+#include <stdlib.h>
+#include <boost/lexical_cast.hpp>
+
+#include <pcl/point_types.h>
+#include <pcl/filters/voxel_grid.h>
+
+#include <sstream>
+
+// tempo
+#include <ctime>
 
 typedef pcl::PointXYZ PointType;
 typedef pcl::Normal NormalType;
 typedef pcl::ReferenceFrame RFType;
 
+typedef pcl::PointWithViewpoint PointTypeViewPoint;
+
 //typedef pcl::Histogram<153> DescriptorType;
- 
+
 std::string model_filename_;
 std::string scene_filename_;
 
@@ -52,14 +67,27 @@ bool use_shot(true);//default
 bool use_pfh(false);
 bool use_usd(false);
 
-float model_ss_ (0.05f);
-float scene_ss_ (0.05f);
+float model_ss_ (0.004f);
+float scene_ss_ (0.004f);
 
 float rf_rad_ (0.015f);
-float descr_rad_ (0.04f);
+float descr_rad_ (0.02f);
 
 float cg_size_ (0.08f);
-float cg_thresh_ (40.0f);
+float cg_thresh_ (100.0f);
+
+float Lim_dist_ (20000.0f);
+
+// Cronometro
+std::clock_t start;
+std::clock_t end;
+
+double diffclock(std::clock_t clock1,std::clock_t clock2)
+{
+  double diffticks = clock2 - clock1;
+  double diffms = diffticks / (CLOCKS_PER_SEC / 1000 );
+  return diffms;
+}
 
 void
 showHelp (char *filename)
@@ -157,18 +185,18 @@ parseCommandLine (int argc, char *argv[])
   }
 
 
-  // Selection of algorithm for Keypoint extration 
+  // Selection of algorithm for Keypoint extration
   std::string used_keypoints;
   if (pcl::console::parse_argument (argc, argv, "--keypoint", used_keypoints) != -1)
   {
     if (used_keypoints.compare ("UniformSample") == 0)
     {
-     
+
     }
     else if (used_keypoints.compare ("ISS") == 0)
     {
       use_uniformsampling = false;
-      use_iss = true;    
+      use_iss = true;
     }
     else if (used_keypoints.compare ("Harris3D") == 0)
     {
@@ -184,23 +212,23 @@ parseCommandLine (int argc, char *argv[])
   }
 
 
-  // Selection of features 
+  // Selection of features
 /*  std::string used_features;
   if (pcl::console::parse_argument (argc, argv, "--features", used_features) != -1)
   {
     if (used_algorithm.compare ("SHOT") == 0)
     {
-      
+
     }
     else if (used_algorithm.compare ("PFH") == 0)
     {
-	use_shot = false;
-	use_pfh = true;
+        use_shot = false;
+        use_pfh = true;
     }
     else if (used_algorithm.compare ("USD") == 0)
     {
-	use_shot = false;	
-	use_usd = true;
+        use_shot = false;
+        use_usd = true;
     }
     else
     {
@@ -219,6 +247,9 @@ parseCommandLine (int argc, char *argv[])
   pcl::console::parse_argument (argc, argv, "--cg_thresh", cg_thresh_);
 }
 
+//***********************************************************************************************
+//                                  Função Cálculo resolução nuvem
+//***********************************************************************************************
 
 
 double
@@ -260,21 +291,21 @@ int
 main (int argc, char *argv[])
 {
   parseCommandLine (argc, argv);
-  
+
   //if(use_shot)
   //{
-	//pcl::SHOT352 DescriptorType;
+        //pcl::SHOT352 DescriptorType;
   //}
   //else if(use_pfh)
   //{
-	typedef pcl::FPFHSignature33 DescriptorType;
+        typedef pcl::FPFHSignature33 DescriptorType;
   //}
   //else if(use_usd)
   //{
 
   //}
 
-
+  pcl::PointCloud<PointTypeViewPoint>::Ptr modelviewpoint (new pcl::PointCloud<PointTypeViewPoint> ());
 
   pcl::PointCloud<PointType>::Ptr model (new pcl::PointCloud<PointType> ());
   pcl::PointCloud<PointType>::Ptr scene (new pcl::PointCloud<PointType> ());
@@ -294,7 +325,7 @@ main (int argc, char *argv[])
   //
   //  Load clouds
   //
-  if (pcl::io::loadPCDFile (model_filename_, *model) < 0)
+  if (pcl::io::loadPCDFile (model_filename_, *modelviewpoint) < 0)
   {
     std::cout << "Error loading model cloud." << std::endl;
     showHelp (argv[0]);
@@ -303,9 +334,30 @@ main (int argc, char *argv[])
   if (pcl::io::loadPCDFile (scene_filename_, *scene) < 0)
   {
     std::cout << "Error loading scene cloud." << std::endl;
-    showHelp (argv[0]);
+    showHelp (argv[1]);
     return (-1);
   }
+
+  // Recolha dos view points para calculo das normais
+  float vpx = modelviewpoint->points[0].vp_x;
+  float vpy = modelviewpoint->points[0].vp_y;
+  float vpz = modelviewpoint->points[0].vp_z;
+
+  // Copia da nuvem para tipologia sem view points
+  pcl::copyPointCloud<PointTypeViewPoint,PointType>(*modelviewpoint, *model);
+
+
+  // see the resolution of the clouds
+  start = std::clock();                                    // Debug time
+
+  double res_scene = computeCloudResolution(scene);
+  double res_model = computeCloudResolution(model);
+
+  end = std::clock();                                       // Debug time
+  std::cout << "Time computing clouds resolution:  " << diffclock(start, end) << " ms" << endl << endl;
+
+  std::cout << "Scene resolution:  " << res_scene << std::endl;
+  std::cout << "Model resolution:  " << res_model << std::endl;
 
   //
   //  Set up resolution invariance
@@ -334,45 +386,45 @@ main (int argc, char *argv[])
   //  Compute Normals
   //
   pcl::NormalEstimationOMP<PointType, NormalType> norm_est;
-  norm_est.setKSearch (5);
- 
+  norm_est.setKSearch (100);
+
   norm_est.setInputCloud (scene);
   norm_est.compute (*scene_normals);
 
   norm_est.setInputCloud (model);
-  norm_est.setViewPoint(1.0,1.0,1.0);
+  norm_est.setViewPoint(vpx,vpy,vpz);
   norm_est.compute (*model_normals);
 
 
 //
 //  Downsample Clouds to Extract keypoints
 //
-	if(use_uniformsampling)
-	{
-	pcl::UniformSampling<PointType> uniform_sampling;
-	uniform_sampling.setInputCloud (model);
-	uniform_sampling.setRadiusSearch (model_ss_);
-	//uniform_sampling.filter (*model_keypoints);
-	pcl::PointCloud<int> keypointIndices1;
-	uniform_sampling.compute(keypointIndices1);
+        if(use_uniformsampling)
+        {
+        pcl::UniformSampling<PointType> uniform_sampling;
+        uniform_sampling.setInputCloud (model);
+        uniform_sampling.setRadiusSearch (model_ss_);
+        //uniform_sampling.filter (*model_keypoints);
+        pcl::PointCloud<int> keypointIndices1;
+        uniform_sampling.compute(keypointIndices1);
 
-	pcl::copyPointCloud(*model, keypointIndices1.points, *model_keypoints);
-	pcl::copyPointCloud(*model_normals, keypointIndices1.points, *model_keypoints_normals);
+        pcl::copyPointCloud(*model, keypointIndices1.points, *model_keypoints);
+        pcl::copyPointCloud(*model_normals, keypointIndices1.points, *model_keypoints_normals);
 
-	std::cout << "Model total points: " << model->size () << "; Selected Keypoints: " << model_keypoints->size () << std::endl;
+        std::cout << "Model total points: " << model->size () << "; Selected Keypoints: " << model_keypoints->size () << std::endl;
 
 
-	uniform_sampling.setInputCloud (scene);
-	uniform_sampling.setRadiusSearch (scene_ss_);
-	//uniform_sampling.filter (*scene_keypoints);
-	pcl::PointCloud<int> keypointIndices2;
-	uniform_sampling.compute(keypointIndices2);
+        uniform_sampling.setInputCloud (scene);
+        uniform_sampling.setRadiusSearch (scene_ss_);
+        //uniform_sampling.filter (*scene_keypoints);
+        pcl::PointCloud<int> keypointIndices2;
+        uniform_sampling.compute(keypointIndices2);
 
-	pcl::copyPointCloud(*scene, keypointIndices2.points, *scene_keypoints);
-	pcl::copyPointCloud(*scene_normals, keypointIndices2.points, *scene_keypoints_normals);
+        pcl::copyPointCloud(*scene, keypointIndices2.points, *scene_keypoints);
+        pcl::copyPointCloud(*scene_normals, keypointIndices2.points, *scene_keypoints_normals);
 
-	std::cout << "Scene total points: " << scene->size () << "; Selected Keypoints: " << scene_keypoints->size () << std::endl; 
-	}
+        std::cout << "Scene total points: " << scene->size () << "; Selected Keypoints: " << scene_keypoints->size () << std::endl;
+        }
 
 
 
@@ -380,135 +432,176 @@ main (int argc, char *argv[])
   //
   //  Downsample Clouds to Extract keypoints ////////////////////////////////////////////////
   //
-	if(use_iss)
-	{
-	// ISS keypoint detector model.
-	pcl::ISSKeypoint3D<pcl::PointXYZ, pcl::PointXYZ> detector;
-	detector.setInputCloud(model);
-	pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree_model(new pcl::search::KdTree<pcl::PointXYZ>);
-	detector.setSearchMethod(kdtree_model);
-	double resolution_model = computeCloudResolution(model);
-	// Set the radius of the spherical neighborhood used to compute the scatter matrix.
-	detector.setSalientRadius(6 * resolution_model);
-	// Set the radius for the application of the non maxima supression algorithm.
-	detector.setNonMaxRadius(4 * resolution_model);
-	// Set the minimum number of neighbors that has to be found while applying the non maxima suppression algorithm.
-	detector.setMinNeighbors(5);
-	// Set the upper bound on the ratio between the second and the first eigenvalue.
-	detector.setThreshold21(0.975);
-	// Set the upper bound on the ratio between the third and the second eigenvalue.
-	detector.setThreshold32(0.975);
-	// Set the number of prpcessing threads to use. 0 sets it to automatic.
-	detector.setNumberOfThreads(4);
+        if(use_iss)
+        {
+        // ISS keypoint detector model.
+        pcl::ISSKeypoint3D<pcl::PointXYZ, pcl::PointXYZ> detector;
+        detector.setInputCloud(model);
+        pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree_model(new pcl::search::KdTree<pcl::PointXYZ>);
+        detector.setSearchMethod(kdtree_model);
+        double resolution_model = computeCloudResolution(model);
+        // Set the radius of the spherical neighborhood used to compute the scatter matrix.
+        detector.setSalientRadius(6 * resolution_model);
+        // Set the radius for the application of the non maxima supression algorithm.
+        detector.setNonMaxRadius(4 * resolution_model);
+        // Set the minimum number of neighbors that has to be found while applying the non maxima suppression algorithm.
+        detector.setMinNeighbors(5);
+        // Set the upper bound on the ratio between the second and the first eigenvalue.
+        detector.setThreshold21(0.975);
+        // Set the upper bound on the ratio between the third and the second eigenvalue.
+        detector.setThreshold32(0.975);
+        // Set the number of prpcessing threads to use. 0 sets it to automatic.
+        detector.setNumberOfThreads(4);
 
-	detector.setNormalRadius (4 * resolution_model);
-	detector.setBorderRadius (1 * resolution_model);
- 
-	detector.compute(*model_keypoints);
-	std::cout << "model_keypoints: " << model_keypoints->size () << std::endl;//debug
+        detector.setNormalRadius (4 * resolution_model);
+        detector.setBorderRadius (1 * resolution_model);
+
+        detector.compute(*model_keypoints);
+        std::cout << "model_keypoints: " << model_keypoints->size () << std::endl;//debug
 
 
 
-	// ISS keypoint detector scene.
-	//pcl::ISSKeypoint3D<pcl::PointXYZ, pcl::PointXYZ> detector;
-	detector.setInputCloud(scene);
-	pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree_scene(new pcl::search::KdTree<pcl::PointXYZ>);
-	detector.setSearchMethod(kdtree_scene);
-	double resolution_scene = computeCloudResolution(scene);
-	// Set the radius of the spherical neighborhood used to compute the scatter matrix.
-	detector.setSalientRadius(6 * resolution_scene);
-	// Set the radius for the application of the non maxima supression algorithm.
-	detector.setNonMaxRadius(4 * resolution_scene);
-	// Set the minimum number of neighbors that has to be found while applying the non maxima suppression algorithm.
-	detector.setMinNeighbors(5);
-	// Set the upper bound on the ratio between the second and the first eigenvalue.
-	detector.setThreshold21(0.975);
-	// Set the upper bound on the ratio between the third and the second eigenvalue.
-	detector.setThreshold32(0.975);
-	// Set the number of prpcessing threads to use. 0 sets it to automatic.
-	detector.setNumberOfThreads(4);
+        // ISS keypoint detector scene.
+        //pcl::ISSKeypoint3D<pcl::PointXYZ, pcl::PointXYZ> detector;
+        detector.setInputCloud(scene);
+        pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree_scene(new pcl::search::KdTree<pcl::PointXYZ>);
+        detector.setSearchMethod(kdtree_scene);
+        double resolution_scene = computeCloudResolution(scene);
+        // Set the radius of the spherical neighborhood used to compute the scatter matrix.
+        detector.setSalientRadius(6 * resolution_scene);
+        // Set the radius for the application of the non maxima supression algorithm.
+        detector.setNonMaxRadius(4 * resolution_scene);
+        // Set the minimum number of neighbors that has to be found while applying the non maxima suppression algorithm.
+        detector.setMinNeighbors(5);
+        // Set the upper bound on the ratio between the second and the first eigenvalue.
+        detector.setThreshold21(0.975);
+        // Set the upper bound on the ratio between the third and the second eigenvalue.
+        detector.setThreshold32(0.975);
+        // Set the number of prpcessing threads to use. 0 sets it to automatic.
+        detector.setNumberOfThreads(4);
 
-	detector.setNormalRadius (4 * resolution_scene);
-	detector.setBorderRadius (1 * resolution_scene);
- 
-	detector.compute(*scene_keypoints);
-	std::cout << "scene_keypoints: " << scene_keypoints->size () << std::endl;//debug
-	}
+        detector.setNormalRadius (4 * resolution_scene);
+        detector.setBorderRadius (1 * resolution_scene);
+
+        detector.compute(*scene_keypoints);
+        std::cout << "scene_keypoints: " << scene_keypoints->size () << std::endl;//debug
+        }
   //
   //  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // 
+  //
 
 
   //
   //  Compute Descriptor for keypoints SHOT
   //
-/*	if(use_shot)
-	{
-	pcl::SHOTEstimationOMP<PointType, NormalType, DescriptorType> descr_est;
-	descr_est.setRadiusSearch (descr_rad_);
+/*      if(use_shot)
+        {
+        pcl::SHOTEstimationOMP<PointType, NormalType, DescriptorType> descr_est;
+        descr_est.setRadiusSearch (descr_rad_);
 
-	descr_est.setInputCloud (model_keypoints);
-	descr_est.setInputNormals (model_normals);
-	descr_est.setSearchSurface (model);
-	descr_est.compute (*model_descriptors);
+        descr_est.setInputCloud (model_keypoints);
+        descr_est.setInputNormals (model_normals);
+        descr_est.setSearchSurface (model);
+        descr_est.compute (*model_descriptors);
 
-	descr_est.setInputCloud (scene_keypoints);
-	descr_est.setInputNormals (scene_normals);
-	descr_est.setSearchSurface (scene);
-	descr_est.compute (*scene_descriptors);
-	}
+        descr_est.setInputCloud (scene_keypoints);
+        descr_est.setInputNormals (scene_normals);
+        descr_est.setSearchSurface (scene);
+        descr_est.compute (*scene_descriptors);
+        }
 */
 
   //
   //  Compute Descriptor for keypoints PFH
   //
-/*	if(use_pfh)
-	{
-	pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree(new pcl::search::KdTree<pcl::PointXYZ>);
+/*      if(use_pfh)
+        {
+        pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree(new pcl::search::KdTree<pcl::PointXYZ>);
 
- 	pcl::PFHEstimation<PointType, NormalType, DescriptorType> descr_est;
-	descr_est.setRadiusSearch (descr_rad_);
+        pcl::PFHEstimation<PointType, NormalType, DescriptorType> descr_est;
+        descr_est.setRadiusSearch (descr_rad_);
 
-	descr_est.setInputCloud (model_keypoints);
-	descr_est.setInputNormals (model_keypoints_normals);
-	descr_est.setSearchMethod(kdtree);
-	// Search radius, to look for neighbors. Note: the value given here has to be
-	// larger than the radius used to estimate the normals.
-	descr_est.compute (*model_descriptors);
+        descr_est.setInputCloud (model_keypoints);
+        descr_est.setInputNormals (model_keypoints_normals);
+        descr_est.setSearchMethod(kdtree);
+        // Search radius, to look for neighbors. Note: the value given here has to be
+        // larger than the radius used to estimate the normals.
+        descr_est.compute (*model_descriptors);
 
-	descr_est.setInputCloud (scene_keypoints);
-	descr_est.setInputNormals (scene_keypoints_normals);
-	descr_est.setSearchMethod(kdtree);
-	// Search radius, to look for neighbors. Note: the value given here has to be
-	// larger than the radius used to estimate the normals.
-	descr_est.compute (*scene_descriptors);
-	}
+        descr_est.setInputCloud (scene_keypoints);
+        descr_est.setInputNormals (scene_keypoints_normals);
+        descr_est.setSearchMethod(kdtree);
+        // Search radius, to look for neighbors. Note: the value given here has to be
+        // larger than the radius used to estimate the normals.
+        descr_est.compute (*scene_descriptors);
+        }
 */
 
   //
   //  Compute Descriptor for keypoints FPFH
   //
-	//if(use_pfh)
-	//{
-	pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree(new pcl::search::KdTree<pcl::PointXYZ>);
+        //if(use_pfh)
+        //{
+        pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree(new pcl::search::KdTree<pcl::PointXYZ>);
 
- 	pcl::FPFHEstimation<PointType, NormalType, DescriptorType> descr_est;
-	descr_est.setRadiusSearch (descr_rad_);
+        pcl::FPFHEstimation<PointType, NormalType, DescriptorType> descr_est;
+        descr_est.setRadiusSearch (descr_rad_);
 
-	descr_est.setInputCloud (model_keypoints);
-	descr_est.setInputNormals (model_keypoints_normals);
-	descr_est.setSearchMethod(kdtree);
-	// Search radius, to look for neighbors. Note: the value given here has to be
-	// larger than the radius used to estimate the normals.
-	descr_est.compute (*model_descriptors);
+        descr_est.setInputCloud (model_keypoints);
+        descr_est.setInputNormals (model_keypoints_normals);
+        descr_est.setSearchMethod(kdtree);
+        // Search radius, to look for neighbors. Note: the value given here has to be
+        // larger than the radius used to estimate the normals.
+        descr_est.compute (*model_descriptors);
 
-	descr_est.setInputCloud (scene_keypoints);
-	descr_est.setInputNormals (scene_keypoints_normals);
-	descr_est.setSearchMethod(kdtree);
-	// Search radius, to look for neighbors. Note: the value given here has to be
-	// larger than the radius used to estimate the normals.
-	descr_est.compute (*scene_descriptors);
-	//}
+        //Debug----------------------------------------------------------------------------------------
+      /*  for (size_t i = 0; i < model_descriptors->size (); ++i)
+        {
+
+              std::cout << " desccriptors " << i << ":" << model_descriptors->at (i).histogram[0] <<
+                                                   " " << model_descriptors->at (i).histogram[1] <<
+                                                   " " << model_descriptors->at (i).histogram[2] <<
+                                                   " " << model_descriptors->at (i).histogram[3] <<
+                                                   " " << model_descriptors->at (i).histogram[4] <<
+                                                   " " << model_descriptors->at (i).histogram[5] <<
+                                                   " " << model_descriptors->at (i).histogram[6] <<
+                                                   " " << model_descriptors->at (i).histogram[7] <<
+                                                   " " << model_descriptors->at (i).histogram[8] <<
+                                                   " " << model_descriptors->at (i).histogram[9] <<
+                                                   " " << model_descriptors->at (i).histogram[10] <<
+                                                   " " << model_descriptors->at (i).histogram[11] <<
+                                                   " " << model_descriptors->at (i).histogram[12] <<
+                                                   " " << model_descriptors->at (i).histogram[13] <<
+                                                   " " << model_descriptors->at (i).histogram[14] <<
+                                                   " " << model_descriptors->at (i).histogram[15] <<
+                                                   " " << model_descriptors->at (i).histogram[16] <<
+                                                   " " << model_descriptors->at (i).histogram[17] <<
+                                                   " " << model_descriptors->at (i).histogram[18] <<
+                                                   " " << model_descriptors->at (i).histogram[19] <<
+                                                   " " << model_descriptors->at (i).histogram[20] <<
+                                                   " " << model_descriptors->at (i).histogram[21] <<
+                                                   " " << model_descriptors->at (i).histogram[22] <<
+                                                   " " << model_descriptors->at (i).histogram[23] <<
+                                                   " " << model_descriptors->at (i).histogram[24] <<
+                                                   " " << model_descriptors->at (i).histogram[25] <<
+                                                   " " << model_descriptors->at (i).histogram[26] <<
+                                                   " " << model_descriptors->at (i).histogram[27] <<
+                                                   " " << model_descriptors->at (i).histogram[28] <<
+                                                   " " << model_descriptors->at (i).histogram[29] <<
+                                                   " " << model_descriptors->at (i).histogram[30] <<
+                                                   " " << model_descriptors->at (i).histogram[31] <<
+                                                   " " << model_descriptors->at (i).histogram[32] <<
+                                                   " " << model_descriptors->at (i).histogram[33] <<  std::endl;
+        }*/
+        //Debug----------------------------------------------------------------------------------------
+
+        descr_est.setInputCloud (scene_keypoints);
+        descr_est.setInputNormals (scene_keypoints_normals);
+        descr_est.setSearchMethod(kdtree);
+        // Search radius, to look for neighbors. Note: the value given here has to be
+        // larger than the radius used to estimate the normals.
+        descr_est.compute (*scene_descriptors);
+        //}
 
 /*
   //
@@ -517,13 +610,13 @@ main (int argc, char *argv[])
   pcl::SpinImageEstimation<PointType, NormalType, DescriptorType> descr_est;
   // Radius of the support cylinder.
   descr_est.setRadiusSearch(descr_rad_);
-	// Set the resolution of the spin image (the number of bins along one dimension).
-	// Note: you must change the output histogram size to reflect this.
+        // Set the resolution of the spin image (the number of bins along one dimension).
+        // Note: you must change the output histogram size to reflect this.
   descr_est.setImageWidth(8);
 
 
   descr_est.setInputCloud (model_keypoints);
-  descr_est.setInputNormals (model_normals); 
+  descr_est.setInputNormals (model_normals);
   descr_est.compute (*model_descriptors);
 
   descr_est.setInputCloud (scene_keypoints);
@@ -589,13 +682,52 @@ main (int argc, char *argv[])
     std::vector<int> neigh_indices (1);
     std::vector<float> neigh_sqr_dists (1);
 
+            /*  std::cout << " desccriptors " << i << ":" << scene_descriptors->at (i).histogram[0] <<
+                                                   " " << scene_descriptors->at (i).histogram[1] <<
+                                                   " " << scene_descriptors->at (i).histogram[2] <<
+                                                   " " << scene_descriptors->at (i).histogram[3] <<
+                                                   " " << scene_descriptors->at (i).histogram[4] <<
+                                                   " " << scene_descriptors->at (i).histogram[5] <<
+                                                   " " << scene_descriptors->at (i).histogram[6] <<
+                                                   " " << scene_descriptors->at (i).histogram[7] <<
+                                                   " " << scene_descriptors->at (i).histogram[8] <<
+                                                   " " << scene_descriptors->at (i).histogram[9] <<
+                                                   " " << scene_descriptors->at (i).histogram[10] <<
+                                                   " " << scene_descriptors->at (i).histogram[11] <<
+                                                   " " << scene_descriptors->at (i).histogram[12] <<
+                                                   " " << scene_descriptors->at (i).histogram[13] <<
+                                                   " " << scene_descriptors->at (i).histogram[14] <<
+                                                   " " << scene_descriptors->at (i).histogram[15] <<
+                                                   " " << scene_descriptors->at (i).histogram[16] <<
+                                                   " " << scene_descriptors->at (i).histogram[17] <<
+                                                   " " << scene_descriptors->at (i).histogram[18] <<
+                                                   " " << scene_descriptors->at (i).histogram[19] <<
+                                                   " " << scene_descriptors->at (i).histogram[20] <<
+                                                   " " << scene_descriptors->at (i).histogram[21] <<
+                                                   " " << scene_descriptors->at (i).histogram[22] <<
+                                                   " " << scene_descriptors->at (i).histogram[23] <<
+                                                   " " << scene_descriptors->at (i).histogram[24] <<
+                                                   " " << scene_descriptors->at (i).histogram[25] <<
+                                                   " " << scene_descriptors->at (i).histogram[26] <<
+                                                   " " << scene_descriptors->at (i).histogram[27] <<
+                                                   " " << scene_descriptors->at (i).histogram[28] <<
+                                                   " " << scene_descriptors->at (i).histogram[29] <<
+                                                   " " << scene_descriptors->at (i).histogram[30] <<
+                                                   " " << scene_descriptors->at (i).histogram[31] <<
+                                                   " " << scene_descriptors->at (i).histogram[32] <<
+                                                   " " << scene_descriptors->at (i).histogram[33] <<  std::endl;*/
+
+
     if (!pcl_isfinite (scene_descriptors->at (i).histogram[0])) //skipping NaNs
     {
       continue;
     }
 
     int found_neighs = match_search.nearestKSearch (scene_descriptors->at (i), 1, neigh_indices, neigh_sqr_dists);
-    if(found_neighs == 1 && neigh_sqr_dists[0] < 700) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
+
+          std::cout << "neigh_sqr_dists: " << neigh_sqr_dists[0] << std::endl; //debugg
+
+    if(found_neighs == 1 && neigh_sqr_dists[0] < Lim_dist_) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
     {
       pcl::Correspondence corr (neigh_indices[0], static_cast<int> (i), neigh_sqr_dists[0]);
       model_scene_corrs->push_back (corr);
@@ -659,9 +791,11 @@ main (int argc, char *argv[])
     gc_clusterer.setInputCloud (model_keypoints);
     gc_clusterer.setSceneCloud (scene_keypoints);
     gc_clusterer.setModelSceneCorrespondences (model_scene_corrs);
+    std::cout << "G" << std::endl; //debug
 
     //gc_clusterer.cluster (clustered_corrs);
     gc_clusterer.recognize (rototranslations, clustered_corrs);
+    std::cout << "H" << std::endl; //debug
   }
 
 
@@ -704,6 +838,9 @@ main (int argc, char *argv[])
   pcl::visualization::PointCloudColorHandlerCustom<PointType> scene_color_handler (scene, 255, 0, 255);
   viewer.addPointCloud (scene,scene_color_handler, "scene_cloud");
 
+  std::string       id = "reference";
+  viewer.addCoordinateSystem(0.1, id, 0);
+
   pcl::PointCloud<PointType>::Ptr off_scene_model (new pcl::PointCloud<PointType> ());
   pcl::PointCloud<PointType>::Ptr off_scene_model_keypoints (new pcl::PointCloud<PointType> ());
 
@@ -741,7 +878,7 @@ main (int argc, char *argv[])
   viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal> (scene, scene_normals, 1, 0.005, "normals");
   viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal> (off_scene_model, model_normals, 1, 0.005, "normal");
 
-  }  
+  }
 
 
 
@@ -753,11 +890,35 @@ main (int argc, char *argv[])
     pcl::PointCloud<PointType>::Ptr rotated_model (new pcl::PointCloud<PointType> ());
     pcl::transformPointCloud (*model, *rotated_model, rototranslations[i]);
 
+    int inst = i;// + ((v + 1) * 10);
+
     std::stringstream ss_cloud;
-    ss_cloud << "instance" << i;
+    ss_cloud << "instance" << inst;
 
     pcl::visualization::PointCloudColorHandlerCustom<PointType> rotated_model_color_handler (rotated_model, 255, 0, 0);
     viewer.addPointCloud (rotated_model, rotated_model_color_handler, ss_cloud.str ());
+
+          // geração da matriz de rotação para os referenciais dos objectos detectados
+          Eigen::Affine3f t;
+
+          Eigen::Matrix3f rotation = rototranslations[i].block<3,3>(0, 0);
+          Eigen::Vector3f translation = rototranslations[i].block<3,1>(0, 3);
+
+          t.linear() = rotation;
+          t.translation() = translation;
+
+          //std::string car = i;
+
+          std::string number;
+          std::stringstream strstream;
+
+          strstream << inst;
+          strstream >> number;
+          //std::string &id = i;
+
+
+          viewer.addCoordinateSystem(0.05, t, number, 0);
+
 
     if (show_correspondences_)
     {
@@ -772,6 +933,33 @@ main (int argc, char *argv[])
         viewer.addLine<PointType, PointType> (model_point, scene_point, 0, 255, 0, ss_line.str ());
       }
     }
+  }
+
+
+          std::string number;
+          std::stringstream strstream;
+
+          std::string ValDes;
+
+  for (size_t i = 0; i < scene_descriptors->size (); ++i)
+  {
+
+          strstream << i;
+          strstream >> number;
+
+          double textScale = 0.01;
+          double         r = 1.0;
+          double         g = 1.0;
+          double         b = 1.0;
+          const std::string & id = number;
+          int            viewport = 1;
+
+          strstream << scene_descriptors->at (i).histogram[0];
+          strstream >> ValDes;
+
+          //std::cout << " desccriptor " << i << ":" << scene_descriptors->at (i).histogram[5] << std::endl;
+
+          viewer.addText3D   (  ValDes, scene_keypoints->points[i], textScale, r, g, b, id, viewport);
   }
 
   while (!viewer.wasStopped ())
