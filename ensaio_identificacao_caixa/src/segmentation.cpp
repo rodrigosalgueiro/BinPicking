@@ -229,7 +229,7 @@ main (int argc, char *argv[])
 
 
 	//guarda a nuvem filtrada num novo ficheiro 
-	//pcl::io::savePCDFileASCII ("Atest_pecasfinal.pcd", *cloud_poligonal_prism);
+	pcl::io::savePCDFileASCII ("test_seg_3pecas.pcd", *cloud_poligonal_prism);
 
 ///////////////////
 // Visualization //

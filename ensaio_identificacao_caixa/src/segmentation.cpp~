@@ -196,7 +196,7 @@ main (int argc, char *argv[])
 	proj_edge.setModelCoefficients (coefficients_edge);
 	proj_edge.filter (*cloud_edge_projected);
 
-	double merge = 0.5;
+	double merge = 0.75;
 	scale(cloud_edge_projected, merge);
 
 	
@@ -229,7 +229,7 @@ main (int argc, char *argv[])
 
 
 	//guarda a nuvem filtrada num novo ficheiro 
-	//pcl::io::savePCDFileASCII ("Atest_pecasfinal.pcd", *cloud_poligonal_prism);
+	//pcl::io::savePCDFileASCII ("test_seg_3pecas.pcd", *cloud_poligonal_prism);
 
 ///////////////////
 // Visualization //
